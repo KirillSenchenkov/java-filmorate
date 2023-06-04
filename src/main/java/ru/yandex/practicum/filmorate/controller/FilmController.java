@@ -27,10 +27,10 @@ public class FilmController {
 
     @PostMapping
     public Film createFilm(@RequestBody Film film) throws ValidationException {
-        if (films.containsKey(film.getId())){
+        if (films.containsKey(film.getId())) {
             log.debug("Фильм уже добавлен - " + films.get(film.getId()));
             throw new ValidationException("Фильм с таким Id уже добавлен");
-        }else {
+        } else {
             validate(film);
             filmId++;
             film.setId(filmId);
@@ -49,7 +49,7 @@ public class FilmController {
             return film;
         } else {
             log.debug("Id отсутствует в списке - " + film.getId());
-            throw new ValidationException("Фильм с ID " + film.getId() + "отсутствует" );
+            throw new ValidationException("Фильм с ID " + film.getId() + "отсутствует");
         }
     }
 }
