@@ -27,7 +27,7 @@ public class UserController {
 
     @PostMapping
     public User createUser(@RequestBody User user) throws ValidationException {
-        if (users.containsKey(user.getId())){
+        if (users.containsKey(user.getId())) {
             log.debug("Пользователь уже существует - " + users.get(user.getId()));
             throw new ValidationException("Пользователь уже существует");
         } else {
@@ -50,7 +50,7 @@ public class UserController {
             users.put(user.getId(), user);
             log.debug("Пользователь обновлен" + user);
             return user;
-        }else {
+        } else {
             log.debug("Id отсутствует в списке - " + user.getId());
             throw new ValidationException("Пользователя с ID " + user.getId() + " нет в системе");
         }
