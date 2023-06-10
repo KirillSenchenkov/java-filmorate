@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static ru.yandex.practicum.filmorate.validator.Validator.validate;
 
@@ -16,7 +17,7 @@ import static ru.yandex.practicum.filmorate.validator.Validator.validate;
 @RequestMapping("/users")
 public class UserController {
     private int userId = 0;
-    private final HashMap<Integer, User> users = new HashMap<>();
+    private final Map<Integer, User> users = new HashMap<>();
 
     @GetMapping
     public List<User> userList() {
@@ -26,7 +27,7 @@ public class UserController {
     }
 
     @PostMapping
-    public User createUser(@RequestBody User user) throws ValidationException {
+    public User createUser(@RequestBody User user) {
         if (users.containsKey(user.getId())) {
             log.debug("Пользователь уже существует - " + users.get(user.getId()));
             throw new ValidationException("Пользователь уже существует");
@@ -44,14 +45,13 @@ public class UserController {
     }
 
     @PutMapping
-    public User updateUser(@RequestBody User user) throws ValidationException {
+    public User updateUser(@RequestBody User user) {
         if (users.containsKey(user.getId())) {
             validate(user);
             users.put(user.getId(), user);
             log.debug("Пользователь обновлен" + user);
             return user;
         } else {
-            log.debug("Id отсутствует в списке - " + user.getId());
             throw new ValidationException("Пользователя с ID " + user.getId() + " нет в системе");
         }
     }

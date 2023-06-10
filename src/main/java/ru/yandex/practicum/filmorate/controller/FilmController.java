@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static ru.yandex.practicum.filmorate.validator.Validator.validate;
 
@@ -17,16 +18,15 @@ import static ru.yandex.practicum.filmorate.validator.Validator.validate;
 public class FilmController {
 
     private int filmId = 0;
-    private final HashMap<Integer, Film> films = new HashMap<>();
+    private final Map<Integer, Film> films = new HashMap<>();
 
     @GetMapping
     public List<Film> filmList() {
-        log.debug("Количество фильмов в списке " + films.size());
         return new ArrayList<>(films.values());
     }
 
     @PostMapping
-    public Film createFilm(@RequestBody Film film) throws ValidationException {
+    public Film createFilm(@RequestBody Film film) {
         if (films.containsKey(film.getId())) {
             log.debug("Фильм уже добавлен - " + films.get(film.getId()));
             throw new ValidationException("Фильм с таким Id уже добавлен");
@@ -41,7 +41,7 @@ public class FilmController {
     }
 
     @PutMapping
-    public Film updateFilm(@RequestBody Film film) throws ValidationException {
+    public Film updateFilm(@RequestBody Film film) {
         if (films.containsKey(film.getId())) {
             validate(film);
             films.put(film.getId(), film);
@@ -49,7 +49,7 @@ public class FilmController {
             return film;
         } else {
             log.debug("Id отсутствует в списке - " + film.getId());
-            throw new ValidationException("Фильм с ID " + film.getId() + "отсутствует");
+            throw new ValidationException("Фильм с ID " + film.getId() + " отсутствует");
         }
     }
 }
