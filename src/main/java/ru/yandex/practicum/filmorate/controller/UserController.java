@@ -6,9 +6,7 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static ru.yandex.practicum.filmorate.validator.Validator.validate;
 
@@ -16,12 +14,9 @@ import static ru.yandex.practicum.filmorate.validator.Validator.validate;
 @RestController
 @RequestMapping("/users")
 public class UserController {
-    private int userId = 0;
-    private final Map<Integer, User> users = new HashMap<>();
 
     @GetMapping
     public List<User> userList() {
-        log.debug("В списке " + users.size() + " пользователей");
         return new ArrayList<>(users.values());
 
     }
