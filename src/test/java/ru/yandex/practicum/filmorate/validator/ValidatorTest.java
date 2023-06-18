@@ -7,6 +7,8 @@ import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import java.time.LocalDate;
 
@@ -14,6 +16,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ValidatorTest {
+    private static InMemoryUserStorage inMemoryUserStorage;
+    private static InMemoryFilmStorage inMemoryFilmStorage;
     private static final LocalDate startDate = LocalDate.of(1895, 12, 28);
     private ValidationException exception;
     public static UserController userController;
@@ -25,8 +29,8 @@ class ValidatorTest {
 
     @BeforeAll
     public static void beforeAll() {
-        userController = new UserController();
-        filmController = new FilmController();
+        userController = new UserController(inMemoryUserStorage);
+        filmController = new FilmController(inMemoryFilmStorage);
     }
 
     @Test
