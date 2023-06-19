@@ -58,6 +58,9 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     public User getTargetUser(Integer id){
-        return users.get(id);
+        if (users.containsKey(id)) {
+            return users.get(id);
+        }
+        throw new ValidationException(String.format("Пользователь c Id %s не найден", id));
     }
 }

@@ -28,7 +28,7 @@ public class InMemoryFilmStorage implements FilmStorage {
             id++;
             film.setId(id);
             films.put(film.getId(), film);
-            log.debug("добавлен новый фильм" + film);
+            log.debug("добавлен новый фильм " + film.getName());
             return film;
         }
     }
@@ -63,6 +63,9 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film getTargetFilm(Integer id){
-        return films.get(id);
+        if (films.containsKey(id)) {
+            return films.get(id);
+        }
+        throw new ValidationException(String.format("Фильм с Id %s не найден", id));
     }
 }

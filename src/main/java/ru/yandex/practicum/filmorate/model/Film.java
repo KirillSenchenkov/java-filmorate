@@ -1,29 +1,33 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 import java.time.LocalDate;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
-@Data
-@AllArgsConstructor
-@Builder
+@Getter
+@Setter
 public class Film {
     private int id;
     private String name;
     private String description;
     private LocalDate releaseDate;
     private Integer duration;
+    private Set<Integer> likes = new LinkedHashSet<>();
+    public Film(String name, String description, LocalDate releaseDate, Integer duration) {
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+    }
 
-    @Builder.Default
-    private Set<String> likes = new LinkedHashSet<>();
+    public void addLike(Integer userId){
+        likes.add(userId);
+    }
 
-    public void addLike(User user){
-        likes.add(user.getName());
+    public void deleteLike(Integer userId){
+        likes.remove(userId);
+
     }
 
 }

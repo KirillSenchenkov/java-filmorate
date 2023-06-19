@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @RestController
@@ -49,9 +50,17 @@ public class FilmController {
 
     @PutMapping("/{filmId}/like/{userId}")
     public String likeFilmByUser(@PathVariable Integer filmId, @PathVariable Integer userId) {
-        filmService.addLike(filmId, inMemoryUserStorage.getTargetUser(userId));
-        return String.format("Пользователь %s, поставил лайк фильму %s.",
-                inMemoryUserStorage.getTargetUser(userId).getName(),
-                inMemoryFilmStorage.getTargetFilm(filmId).getName());
+       return filmService.addLike(filmId, userId);
+    }
+
+    @DeleteMapping("/{filmId}/like/{userId}")
+    public String deleteLike(@PathVariable Integer filmId, @PathVariable Integer userId){
+      return filmService.deleteLike(filmId, userId);
+    }
+
+    @GetMapping("/popular")
+    public Set<Film> getFilmByPopularity(
+            @RequestParam(value = "count", defaultValue = "10", required = false) Integer count){
+        return filmService.getFilmByPopularity(count);
     }
 }
