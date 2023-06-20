@@ -57,10 +57,16 @@ public class InMemoryUserStorage implements UserStorage {
         return new ArrayList<>(users.values());
     }
 
+    @Override
     public User getTargetUser(Integer id){
         if (users.containsKey(id)) {
             return users.get(id);
         }
         throw new ValidationException(String.format("Пользователь c Id %s не найден", id));
+    }
+
+    @Override
+    public Map<Integer, User> getUsers() {
+        return users;
     }
 }
