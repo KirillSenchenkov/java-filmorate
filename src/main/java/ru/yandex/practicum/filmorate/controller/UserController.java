@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -18,7 +19,7 @@ public class UserController {
     private final UserService userService;
 
     @Autowired
-    public UserController(UserStorage userStorage, UserService userService){
+    public UserController(UserStorage userStorage, UserService userService) {
         this.userStorage = userStorage;
         this.userService = userService;
     }
@@ -26,12 +27,11 @@ public class UserController {
     @GetMapping
     public List<User> userList() {
         return userStorage.allUsers();
-
     }
 
     @PostMapping
     public User createUser(@RequestBody User user) {
-       return userStorage.create(user);
+        return userStorage.create(user);
     }
 
     @PutMapping
@@ -39,8 +39,13 @@ public class UserController {
         return userStorage.update(user);
     }
 
+    @GetMapping("{userId}")
+    public User getUserById(@PathVariable Integer userId) {
+        return userStorage.getTargetUser(userId);
+    }
+
     @DeleteMapping("/{userId}")
-    public String deleteUser(@PathVariable Integer userId){
+    public String deleteUser(@PathVariable Integer userId) {
         return userStorage.delete(userId);
     }
 
@@ -55,12 +60,12 @@ public class UserController {
     }
 
     @GetMapping("{userId}/friends")
-    public List<String> allUsersFriends (@PathVariable Integer userId) {
+    public List<User> allUsersFriends(@PathVariable Integer userId) {
         return userService.allUsersFriends(userId);
     }
 
     @GetMapping("{userId}/friends/common/{otherId}")
-    public List<String> allCommonFriend(@PathVariable Integer userId, @PathVariable Integer otherId) {
+    public List<User> allCommonFriend(@PathVariable Integer userId, @PathVariable Integer otherId) {
         return userService.allCommonFriends(userId, otherId);
     }
 }

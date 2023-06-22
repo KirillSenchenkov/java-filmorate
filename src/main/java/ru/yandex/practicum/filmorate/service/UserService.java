@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.IncorrectIdException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -27,7 +28,7 @@ public class UserService {
                     userStorage.getTargetUser(id).getName(),
                     userStorage.getTargetUser(friendId).getName());
         }
-        return "Один из пользователей отсутствует в списке";
+        throw new IncorrectIdException("Один из идентификаторов не верный");
     }
 
     public String deleteFriend(Integer id, Integer friendId) {
@@ -42,18 +43,18 @@ public class UserService {
         return "Пользователи не друзья";
     }
 
-    public List<String> allUsersFriends(Integer id) {
+    public List<User> allUsersFriends(Integer id) {
         Set<Integer> friends = userStorage.getTargetUser(id).getFriends();
-        return friends.stream().map(friendId -> userStorage.getTargetUser(friendId).getName())
+        return friends.stream().map(userStorage::getTargetUser)
                 .collect(Collectors.toList());
 
     }
 
-    public List<String> allCommonFriends(Integer id, Integer otherId) {
+    public List<User> allCommonFriends(Integer id, Integer otherId) {
         Set<Integer> userFriends = userStorage.getTargetUser(id).getFriends();
         Set<Integer> targetFriends = userStorage.getTargetUser(otherId).getFriends();
         return userFriends.stream().filter(targetFriends::contains)
-                .map(friendId -> userStorage.getTargetUser(friendId).getName())
+                .map(userStorage::getTargetUser)
                 .collect(Collectors.toList());
     }
 }

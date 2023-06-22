@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.film;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exception.IncorrectIdException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -18,6 +19,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     private Integer id = 0;
     private final Map<Integer, Film> films = new HashMap<>();
+
     @Override
     public Film create(Film film) {
         if (films.containsKey(film.getId())) {
@@ -62,10 +64,10 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film getTargetFilm(Integer id){
+    public Film getTargetFilm(Integer id) {
         if (films.containsKey(id)) {
             return films.get(id);
         }
-        throw new ValidationException(String.format("Фильм с Id %s не найден", id));
+        throw new IncorrectIdException(String.format("Фильм с Id %s не найден", id));
     }
 }

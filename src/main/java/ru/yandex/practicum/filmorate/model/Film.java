@@ -16,6 +16,7 @@ public class Film {
     private LocalDate releaseDate;
     private Integer duration;
     private Set<Integer> likes = new LinkedHashSet<>();
+
     public Film(String name, String description, LocalDate releaseDate, Integer duration) {
         this.name = name;
         this.description = description;
@@ -23,11 +24,11 @@ public class Film {
         this.duration = duration;
     }
 
-    public void addLike(Integer userId){
+    public void addLike(Integer userId) {
         likes.add(userId);
     }
 
-    public void deleteLike(Integer userId){
+    public void deleteLike(Integer userId) {
         likes.remove(userId);
 
     }
