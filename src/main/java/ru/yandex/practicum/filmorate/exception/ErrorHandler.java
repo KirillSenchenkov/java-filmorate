@@ -15,4 +15,10 @@ public class ErrorHandler {
     public Map<String, String> handleIncorrectId(IncorrectIdException exception) {
         return Map.of("Некорректный идентификатор пользователя", exception.getMessage());
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public Map<String, String> handleServerError(RuntimeException exception) {
+        return Map.of("Ошибка сервера", exception.getMessage());
+    }
 }

@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.validator;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
@@ -23,29 +22,23 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ValidatorTest {
-    private static final LocalDate startDate = LocalDate.of(1895, 12, 28);
+    private static final LocalDate START_DATE = LocalDate.of(1895, 12, 28);
     private ValidationException exception;
 
-    private static final UserStorage userStorage = new InMemoryUserStorage();
-    private static final UserService userService = new UserService(userStorage);
-    private static final FilmStorage filmStorage = new InMemoryFilmStorage();
-    private static final FilmService filmService = new FilmService(filmStorage, userStorage);
+    public UserStorage userStorage = new InMemoryUserStorage();
+    private final UserService userService = new UserService(userStorage);
+    private final FilmStorage filmStorage = new InMemoryFilmStorage();
+    private final FilmService filmService = new FilmService(filmStorage, userStorage);
 
-    public static UserController userController;
-    public static FilmController filmController;
+    public final UserController userController = new UserController(userStorage, userService);
+    public final FilmController filmController = new FilmController(filmStorage, filmService);
     public User user = new User("sunbaked@list.ru", "Maikoo", "Heikoo",
             LocalDate.of(1991, 11, 18));
     public Film film = new Film("Film", "Film",
             LocalDate.of(2000, 11, 11), 100);
 
-    @BeforeAll
-    public static void beforeAll() {
-        userController = new UserController(userStorage, userService);
-        filmController = new FilmController(filmStorage, filmService);
-    }
-
     @ParameterizedTest(name = "параметризованный тест c Email {index} - {0}")
-    @ValueSource(strings = "sunbaked")
+    @ValueSource(strings = "not_valid_email")
     @NullAndEmptySource
     void shouldThrownExceptionForIncorrectUSerEmail(String arg) {
         user.setEmail(arg);
@@ -54,7 +47,7 @@ class ValidatorTest {
     }
 
     @ParameterizedTest(name = "параметризованный тест c Login {index} - {0}")
-    @ValueSource(strings = "Maikoo Heikoo")
+    @ValueSource(strings = "name with space")
     @NullAndEmptySource
     void shouldThrownExceptionForIncorrectUserLogin(String arg) {
         user.setLogin(arg);
@@ -87,7 +80,7 @@ class ValidatorTest {
         assertEquals("Дата создания не может пустой", exception.getMessage());
         film.setReleaseDate(LocalDate.of(1000, 11, 11));
         exception = assertThrows(ValidationException.class, (() -> filmController.createFilm(film)));
-        assertEquals("Дата создания не может быть раньше " + startDate, exception.getMessage());
+        assertEquals("Дата создания не может быть раньше " + START_DATE, exception.getMessage());
     }
 
     @Test
