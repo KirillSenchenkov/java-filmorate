@@ -1,60 +1,65 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import static ru.yandex.practicum.filmorate.validator.Validator.validate;
 
 @Slf4j
 @RestController
 @RequestMapping("/users")
+@AllArgsConstructor
 public class UserController {
-    private int userId = 0;
-    private final Map<Integer, User> users = new HashMap<>();
+
+    private final UserStorage userStorage;
+    private final UserService userService;
 
     @GetMapping
     public List<User> userList() {
-        log.debug("В списке " + users.size() + " пользователей");
-        return new ArrayList<>(users.values());
-
+        return userStorage.allUsers();
     }
 
     @PostMapping
     public User createUser(@RequestBody User user) {
-        if (users.containsKey(user.getId())) {
-            log.debug("Пользователь уже существует - " + users.get(user.getId()));
-            throw new ValidationException("Пользователь уже существует");
-        } else {
-            validate(user);
-            if (user.getName() == null || user.getName().isBlank()) {
-                user.setName(user.getLogin());
-            }
-            userId++;
-            user.setId(userId);
-            users.put(user.getId(), user);
-            log.debug("Пользователь добавлен " + user);
-            return user;
-        }
+        return userStorage.create(user);
     }
 
     @PutMapping
     public User updateUser(@RequestBody User user) {
-        if (users.containsKey(user.getId())) {
-            validate(user);
-            users.put(user.getId(), user);
-            log.debug("Пользователь обновлен" + user);
-            return user;
-        } else {
-            throw new ValidationException("Пользователя с ID " + user.getId() + " нет в системе");
-        }
+        return userStorage.update(user);
     }
 
+    @GetMapping("{userId}")
+    public User getUserById(@PathVariable Integer userId) {
+        return userStorage.getTargetUser(userId);
+    }
 
+    @DeleteMapping("/{userId}")
+    public String deleteUser(@PathVariable Integer userId) {
+        return userStorage.delete(userId);
+    }
+
+    @PutMapping("{userId}/friends/{friendId}")
+    public String addFriend(@PathVariable Integer userId, @PathVariable Integer friendId) {
+        return userService.addFriend(userId, friendId);
+    }
+
+    @DeleteMapping("{userId}/friends/{friendId}")
+    public String deleteFriend(@PathVariable Integer userId, @PathVariable Integer friendId) {
+        return userService.deleteFriend(userId, friendId);
+    }
+
+    @GetMapping("{userId}/friends")
+    public List<User> allUsersFriends(@PathVariable Integer userId) {
+        return userService.allUsersFriends(userId);
+    }
+
+    @GetMapping("{userId}/friends/common/{otherId}")
+    public List<User> allCommonFriend(@PathVariable Integer userId, @PathVariable Integer otherId) {
+        return userService.allCommonFriends(userId, otherId);
+    }
 }

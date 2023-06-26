@@ -9,10 +9,9 @@ import java.time.LocalDate;
 
 @Slf4j
 public class Validator {
-    private static int userId = 0;
     private static final LocalDate startDate = LocalDate.of(1895, 12, 28);
 
-    public static void validate(User user) throws ValidationException {
+    public static void validate(User user) {
         if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
             log.debug("Email адрес указан не верно: " + user.getEmail());
             throw new ValidationException("Email адрес указан не верно");
@@ -30,7 +29,7 @@ public class Validator {
         }
     }
 
-    public static void validate(Film film) throws ValidationException {
+    public static void validate(Film film) {
         if (film.getName() == null || film.getName().isBlank()) {
             log.debug("Пустое название фильма");
             throw new ValidationException("Название фильма не может быть пустым");

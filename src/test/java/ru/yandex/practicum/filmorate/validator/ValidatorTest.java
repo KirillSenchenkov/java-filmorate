@@ -1,12 +1,20 @@
 package ru.yandex.practicum.filmorate.validator;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 
@@ -14,43 +22,35 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ValidatorTest {
-    private static final LocalDate startDate = LocalDate.of(1895, 12, 28);
+    private static final LocalDate START_DATE = LocalDate.of(1895, 12, 28);
     private ValidationException exception;
-    public static UserController userController;
-    public static FilmController filmController;
-    public User user = new User(1, "sunbaked@list.ru", "Maikoo", "Heikoo",
+
+    public UserStorage userStorage = new InMemoryUserStorage();
+    private final UserService userService = new UserService(userStorage);
+    private final FilmStorage filmStorage = new InMemoryFilmStorage();
+    private final FilmService filmService = new FilmService(filmStorage, userStorage);
+
+    public final UserController userController = new UserController(userStorage, userService);
+    public final FilmController filmController = new FilmController(filmStorage, filmService);
+    public User user = new User("sunbaked@list.ru", "Maikoo", "Heikoo",
             LocalDate.of(1991, 11, 18));
-    public Film film = new Film(1, "Film", "Film",
+    public Film film = new Film("Film", "Film",
             LocalDate.of(2000, 11, 11), 100);
 
-    @BeforeAll
-    public static void beforeAll() {
-        userController = new UserController();
-        filmController = new FilmController();
-    }
-
-    @Test
-    void shouldThrownExceptionForIncorrectUSerEmail() {
-        user.setEmail("");
-        exception = assertThrows(ValidationException.class, (() -> userController.createUser(user)));
-        assertEquals("Email адрес указан не верно", exception.getMessage());
-        user.setEmail(null);
-        exception = assertThrows(ValidationException.class, (() -> userController.createUser(user)));
-        assertEquals("Email адрес указан не верно", exception.getMessage());
-        user.setEmail("sunbaked");
+    @ParameterizedTest(name = "параметризованный тест c Email {index} - {0}")
+    @ValueSource(strings = "not_valid_email")
+    @NullAndEmptySource
+    void shouldThrownExceptionForIncorrectUSerEmail(String arg) {
+        user.setEmail(arg);
         exception = assertThrows(ValidationException.class, (() -> userController.createUser(user)));
         assertEquals("Email адрес указан не верно", exception.getMessage());
     }
 
-    @Test
-    void shouldThrownExceptionForIncorrectUserLogin() {
-        user.setLogin("");
-        exception = assertThrows(ValidationException.class, (() -> userController.createUser(user)));
-        assertEquals("Логин не может быть пустым или содержать в себе пробелы", exception.getMessage());
-        user.setLogin(null);
-        exception = assertThrows(ValidationException.class, (() -> userController.createUser(user)));
-        assertEquals("Логин не может быть пустым или содержать в себе пробелы", exception.getMessage());
-        user.setLogin("Maikoo Heikoo");
+    @ParameterizedTest(name = "параметризованный тест c Login {index} - {0}")
+    @ValueSource(strings = "name with space")
+    @NullAndEmptySource
+    void shouldThrownExceptionForIncorrectUserLogin(String arg) {
+        user.setLogin(arg);
         exception = assertThrows(ValidationException.class, (() -> userController.createUser(user)));
         assertEquals("Логин не может быть пустым или содержать в себе пробелы", exception.getMessage());
     }
@@ -65,12 +65,10 @@ class ValidatorTest {
         assertEquals("Дата рождения не может быть в будущем", exception.getMessage());
     }
 
-    @Test
-    void shouldThrownExceptionForIncorrectFilmName() {
-        film.setName("");
-        exception = assertThrows(ValidationException.class, (() -> filmController.createFilm(film)));
-        assertEquals("Название фильма не может быть пустым", exception.getMessage());
-        film.setName(null);
+    @ParameterizedTest(name = "параметризованный тест c Name {index} - {0}")
+    @NullAndEmptySource
+    void shouldThrownExceptionForIncorrectFilmName(String arg) {
+        film.setName(arg);
         exception = assertThrows(ValidationException.class, (() -> filmController.createFilm(film)));
         assertEquals("Название фильма не может быть пустым", exception.getMessage());
     }
@@ -82,7 +80,7 @@ class ValidatorTest {
         assertEquals("Дата создания не может пустой", exception.getMessage());
         film.setReleaseDate(LocalDate.of(1000, 11, 11));
         exception = assertThrows(ValidationException.class, (() -> filmController.createFilm(film)));
-        assertEquals("Дата создания не может быть раньше " + startDate, exception.getMessage());
+        assertEquals("Дата создания не может быть раньше " + START_DATE, exception.getMessage());
     }
 
     @Test
