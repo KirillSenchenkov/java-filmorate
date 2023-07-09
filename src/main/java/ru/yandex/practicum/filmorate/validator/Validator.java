@@ -50,6 +50,7 @@ public class Validator {
             throw new ValidationException("Продолжительность фильма не может быть отрицательной");
         } else {
             log.debug("Проверка фильма пройдена");
+
         }
     }
 

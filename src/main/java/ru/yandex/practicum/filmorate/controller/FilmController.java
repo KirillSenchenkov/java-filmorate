@@ -4,8 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.service.film.InMemoryFilmService;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.film.GenreDbStorage;
+import ru.yandex.practicum.filmorate.storage.film.MpaDbStorage;
 
 import java.util.List;
 
@@ -16,7 +19,7 @@ import java.util.List;
 public class FilmController {
 
     private final FilmStorage filmStorage;
-    private final FilmService filmService;
+    private final InMemoryFilmService filmService;
 
     @GetMapping
     public List<Film> filmList() {
@@ -58,4 +61,6 @@ public class FilmController {
             @RequestParam(value = "count", defaultValue = "10", required = false) Integer count) {
         return filmService.getFilmByPopularity(count);
     }
+
+
 }

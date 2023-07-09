@@ -1,10 +1,11 @@
-package ru.yandex.practicum.filmorate.service;
+package ru.yandex.practicum.filmorate.service.film;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.IncorrectIdException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.film.FilmService;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -13,11 +14,12 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
-public class FilmService {
+public class InMemoryFilmService implements FilmService {
 
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
 
+    @Override
     public String addLike(Integer filmId, Integer userId) {
         Film film = filmStorage.getTargetFilm(filmId);
         List<User> users = userStorage.allUsers();
@@ -30,6 +32,7 @@ public class FilmService {
         return String.format("Пользователь с Id %s отсутствует в списке", userId);
     }
 
+    @Override
     public String deleteLike(Integer filmId, Integer userId) {
         Film film = filmStorage.getTargetFilm(filmId);
         if (film.getLikes().contains(userId)) {
@@ -39,6 +42,7 @@ public class FilmService {
         throw new IncorrectIdException(String.format("Лайк пользователя с Id %s не найден", userId));
     }
 
+    @Override
     public List<Film> getFilmByPopularity(Integer count) {
         List<Film> films = filmStorage.allFilms();
         return films.stream().sorted((film1, film2) -> {
