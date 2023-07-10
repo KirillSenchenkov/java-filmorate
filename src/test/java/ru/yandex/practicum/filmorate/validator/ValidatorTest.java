@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -14,7 +13,6 @@ import ru.yandex.practicum.filmorate.service.film.InMemoryFilmService;
 import ru.yandex.practicum.filmorate.service.user.InMemoryUserService;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
-import ru.yandex.practicum.filmorate.storage.film.MpaDbStorage;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -34,7 +32,7 @@ class ValidatorTest {
 
     public final UserController userController = new UserController(userStorage, userService);
     public final FilmController filmController = new FilmController(filmStorage, filmService);
-    public User user = new User("sunbaked@list.ru", "Maikoo", "Heikoo",
+    public User user = new User("Maikoo", "Heikoo", "sunbaked@list.ru",
             LocalDate.of(1991, 11, 18));
     public Film film = new Film("Film", "Film",
             LocalDate.of(2000, 11, 11), 100);

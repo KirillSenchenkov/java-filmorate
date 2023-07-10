@@ -16,13 +16,14 @@ import java.util.List;
 public class MpaController {
 
     private final MpaDbStorage mpaDbStorage;
+
     @GetMapping
     public List<Mpa> getAllMpa() {
         return mpaDbStorage.getAllMpa();
     }
 
     @GetMapping("/{mpaId}")
-    public Mpa getTargetMpa (@PathVariable Integer mpaId) {
-         return mpaDbStorage.getTargetMpa(mpaId);
+    public Mpa getTargetMpa(@PathVariable Integer mpaId) {
+        return mpaDbStorage.getTargetMpa(mpaId);
     }
 }

@@ -14,7 +14,7 @@ public class FilmGenreModifier {
     private static final String DOCUMENTARY = "Документальный";
     private static final String FIGHTER = "Боевик";
 
-    public static void modFilmGenres (Film film) {
+    public static void modFilmGenres(Film film) {
         if (film.getGenres().size() != 0) {
             List<Genre> genres = film.getGenres();
             for (Genre genre : genres) {
@@ -24,11 +24,11 @@ public class FilmGenreModifier {
                     genre.setName(DRAMA);
                 } else if (genre.getId() == 3) {
                     genre.setName(CARTOON);
-                }  else if (genre.getId() == 4) {
+                } else if (genre.getId() == 4) {
                     genre.setName(THRILLER);
-                }  else if (genre.getId() == 5) {
+                } else if (genre.getId() == 5) {
                     genre.setName(DOCUMENTARY);
-                }  else if (genre.getId() == 6) {
+                } else if (genre.getId() == 6) {
                     genre.setName(FIGHTER);
                 } else {
                     throw new IncorrectIdException("Идентификатор жанра не верный: " + genre.getId());

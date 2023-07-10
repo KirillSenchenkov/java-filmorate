@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.IncorrectIdException;
@@ -14,6 +13,7 @@ import ru.yandex.practicum.filmorate.service.user.UserSetExtractor;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static ru.yandex.practicum.filmorate.validator.Validator.validate;
 
@@ -22,6 +22,8 @@ import static ru.yandex.practicum.filmorate.validator.Validator.validate;
 @AllArgsConstructor
 @Primary
 public class UserDbStorage implements UserStorage {
+    private static final String SQL_QUERY = "SELECT u.id, u.login, u.name, u.email, u.birthday, uf.friend_id " +
+            "FROM users u Left JOIN user_friend uf ON u.id = uf.user_id";
     private final JdbcTemplate jdbcTemplate;
 
     @Override
@@ -43,14 +45,23 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User update(User user) {
         List<User> users = jdbcTemplate
-                .query("select * from users where id=?", userRowMapper(), user.getId());
-        if (users.size() != 1) {
+                .query(SQL_QUERY + " where id=?", new UserSetExtractor(), user.getId());
+        if (users != null && users.size() != 1) {
             throw new IncorrectIdException(String.format("Пользователь с id %s отсутствует в системе",
                     user.getId()));
         }
-            jdbcTemplate.update("update users set login=?, name=?, email=?, birthday=? where id=?",
-                    user.getLogin(), user.getName(), user.getEmail(), user.getBirthday(), user.getId());
-            return user;
+        jdbcTemplate.update("update users set login=?, name=?, email=?, birthday=? where id=?",
+                user.getLogin(), user.getName(), user.getEmail(), user.getBirthday(), user.getId());
+        Set<Integer> friendsId = user.getFriends();
+        for (Integer friendId : friendsId) {
+            Integer count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM user_friend WHERE user_id=? AND friend_id=?",
+                    Integer.class, user.getId(), friendId);
+            if (count != null && count == 0) {
+                jdbcTemplate.update("insert into user_friend (user_id, friend_id) VALUES (?, ?)",
+                        user.getId(), friendId);
+            }
+        }
+        return user;
     }
 
     @Override
@@ -61,15 +72,13 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<User> allUsers() {
-        return jdbcTemplate.query("SELECT u.id, u.login, u.name, u.email, u.birthday, uf.friend_id " +
-                "FROM users u Left JOIN user_friend uf ON u.id = uf.user_id", new UserSetExtractor());
+        return jdbcTemplate.query(SQL_QUERY, new UserSetExtractor());
     }
 
     @Override
     public User getTargetUser(Integer id) {
-        List<User> users = jdbcTemplate.query("SELECT u.id, u.login, u.name, u.email, u.birthday, uf.friend_id " +
-                "FROM users u left JOIN user_friend uf ON u.id = uf.user_id WHERE u.id =?", userRowMapper(), id);
-        if (users.size() != 1) {
+        List<User> users = jdbcTemplate.query(SQL_QUERY + " WHERE u.id =?", new UserSetExtractor(), id);
+        if (users != null && users.size() != 1) {
             throw new IncorrectIdException(String.format("Пользователь с id %s отсутствует в системе",
                     id));
         }
@@ -84,21 +93,5 @@ public class UserDbStorage implements UserStorage {
             users.put(user.getId(), user);
         }
         return users;
-    }
-
-    private RowMapper<User> userRowMapper() {
-        return (rs, rowNum) -> {
-            User user = new User(
-                    rs.getString("login"),
-                    rs.getString("name"),
-                    rs.getString("email"),
-                    rs.getDate("birthday").toLocalDate()
-            );
-            user.setId(rs.getInt("id"));
-            do {
-                user.getFriends().add(rs.getInt("friend_id"));
-            } while (rs.next());
-            return user;
-        };
     }
 }

@@ -26,12 +26,24 @@ public class FilmSetExtractor implements ResultSetExtractor<List<Film>> {
                     rs.getInt("duration")
             );
             film.setId(rs.getInt("id"));
-            film.setMpa(new Mpa(rs.getInt("mpa_id"), rs.getString("mpa_name")));
-            film.getGenres().add(new Genre(rs.getInt("genre_id"), rs.getString("genre_name")));
+            if (rs.getInt("mpa_id") != 0) {
+                film.setMpa(new Mpa(rs.getInt("mpa_id"), rs.getString("mpa_name")));
+            }
+            if (rs.getInt("genre_id") != 0) {
+                film.getGenres().add(new Genre(rs.getInt("genre_id"), rs.getString("genre_name")));
+            }
+            if (rs.getInt("user_like_id") != 0) {
+                film.addLike(rs.getInt("user_like_id"));
+            }
             if (filmMap.containsKey(rs.getInt("id"))) {
-                filmMap.get(rs.getInt("id")).getGenres()
-                        .add(new Genre(rs.getInt("genre_id"), rs.getString("genre_name")));
-            } else if (!filmMap.containsKey(rs.getInt("id"))){
+                if (rs.getInt("genre_id") != 0) {
+                    filmMap.get(rs.getInt("id")).getGenres()
+                            .add(new Genre(rs.getInt("genre_id"), rs.getString("genre_name")));
+                }
+                if (rs.getInt("user_like_id") != 0) {
+                    filmMap.get(rs.getInt("id")).getLikes().add(rs.getInt("user_like_id"));
+                }
+            } else if (!filmMap.containsKey(rs.getInt("id"))) {
                 filmMap.put(rs.getInt("id"), film);
             }
         }

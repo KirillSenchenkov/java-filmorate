@@ -2,9 +2,6 @@ package ru.yandex.practicum.filmorate.service.user;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.ResultSet;
@@ -27,11 +24,15 @@ public class UserSetExtractor implements ResultSetExtractor<List<User>> {
                     rs.getDate("birthday").toLocalDate()
             );
             user.setId(rs.getInt("id"));
-            user.getFriends().add(rs.getInt("friend_id"));
+            if (rs.getInt("friend_id") != 0) {
+                user.getFriends().add(rs.getInt("friend_id"));
+            }
 
             if (userMap.containsKey(rs.getInt("id"))) {
-                userMap.get(rs.getInt("id")).getFriends().add(rs.getInt("friend_id"));
-            } else if (!userMap.containsKey(rs.getInt("id"))){
+                if (rs.getInt("friend_id") != 0) {
+                    userMap.get(rs.getInt("id")).getFriends().add(rs.getInt("friend_id"));
+                }
+            } else if (!userMap.containsKey(rs.getInt("id"))) {
                 userMap.put(rs.getInt("id"), user);
             }
         }

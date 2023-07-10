@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.model;
 
 import lombok.Getter;
 import lombok.Setter;
-import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
@@ -18,7 +17,7 @@ public class User {
     private LocalDate birthday;
     private Set<Integer> friends = new LinkedHashSet<>();
 
-    public User(String login, String name, String email,  LocalDate birthday) {
+    public User(String login, String name, String email, LocalDate birthday) {
         this.email = email;
         this.login = login;
         this.name = name;

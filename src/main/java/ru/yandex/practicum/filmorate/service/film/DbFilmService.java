@@ -28,9 +28,15 @@ public class DbFilmService implements FilmService {
         List<User> users = userStorage.allUsers();
         for (User user : users) {
             if (user.getId() == userId) {
-                film.addLike(userId);
-                jdbcTemplate.update("INSERT INTO film_like (film_id, user_id) VALUES (?, ?)", filmId, userId);
-                return String.format("Пользователь с Id %s, поставил лайк фильму %s.", userId, film.getName());
+                Integer count = jdbcTemplate
+                        .queryForObject("SELECT COUNT(*) FROM film_like WHERE film_id = ? AND user_id = ?",
+                                Integer.class, film.getId(), userId);
+                if (count != null && count == 0) {
+                    jdbcTemplate.update("INSERT INTO film_like (film_id, user_id) VALUES (?, ?)", filmId, userId);
+                    return String.format("Пользователь с Id %s, поставил лайк фильму %s.", userId, film.getName());
+                }
+
+                return String.format("Пользователь с Id %s, уже ставил лайк фильму %s.", userId, film.getName());
             }
         }
         return String.format("Пользователь с Id %s отсутствует в списке", userId);

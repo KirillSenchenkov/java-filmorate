@@ -77,16 +77,33 @@ public class FilmDbStorage implements FilmStorage {
     public Film update(Film film) {
         List<Film> films = jdbcTemplate.query(SQL_QUERY, new FilmSetExtractor(), film.getId());
 
-        if (films.size() != 1) {
+        if (films != null && films.size() != 1) {
             throw new IncorrectIdException(String.format("Фильм с id %s отсутствует в системе",
                     film.getId()));
         }
         jdbcTemplate.update("update films set name=?, description=?, releaseDate=?, duration=?," +
-                        " mpa_id=?, genres=? where id=?",
+                        " mpa_id=? where id=?",
                 film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(),
                 film.getMpa().getId(), film.getId());
+        jdbcTemplate.update("delete from film_genre where film_id = ?", film.getId());
+        List<Genre> genres = film.getGenres();
+
+        for (Genre genre : genres) {
+            Integer count = jdbcTemplate
+                    .queryForObject("SELECT COUNT(*) FROM film_genre WHERE film_id = ? AND genre_id = ?",
+                            Integer.class, film.getId(), genre.getId());
+            if (count != null && count == 0) {
+                jdbcTemplate.update("insert into film_genre (film_id, genre_id) values (?, ?)",
+                        film.getId(), genre.getId());
+            }
+        }
+        List<Film> updateResult = jdbcTemplate.query(SQL_QUERY, new FilmSetExtractor(), film.getId());
+        if (updateResult != null && updateResult.size() > 0) {
+            return updateResult.get(0);
+        }
         return film;
     }
+
     @Override
     public String delete(Integer id) {
         jdbcTemplate.update("DELETE FROM films WHERE id=?", id);
@@ -114,26 +131,4 @@ public class FilmDbStorage implements FilmStorage {
         }
         return films.get(0);
     }
-
-/*    public RowMapper<Film> filmRowMapper() {
-        return (rs, rowNum) -> {
-            Film film = new Film(
-                    rs.getString("name"),
-                    rs.getString("description"),
-                    rs.getDate("releaseDate").toLocalDate(),
-                    rs.getInt("duration")
-            );
-            film.setId(rs.getInt("id"));
-            film.setMpa(new Mpa(rs.getInt("mpa_id"), rs.getString("mpa_name")));
-            do {
-                Genre genre = new Genre(rs.getInt("genre_id"),
-                        rs.getString("genre_name"));
-                film.getGenres().add(genre);
-            } while (rs.next());
-            do {
-                film.addLike(rs.getInt("user_like_id"));
-            } while (rs.next());
-            return film;
-        };
-    }*/
 }
