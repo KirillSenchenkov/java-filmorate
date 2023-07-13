@@ -9,14 +9,13 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.IncorrectIdException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.service.film.FilmSetExtractor;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static ru.yandex.practicum.filmorate.service.film.FilmGenreModifier.modFilmGenres;
-import static ru.yandex.practicum.filmorate.service.film.FilmMpaModifier.modFilmMpa;
 import static ru.yandex.practicum.filmorate.validator.Validator.validate;
 
 @Component
@@ -39,12 +38,6 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film create(Film film) {
         validate(film);
-        if (film.getMpa() != null) {
-            modFilmGenres(film);
-        }
-        if (film.getGenres() != null) {
-            modFilmMpa(film);
-        }
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate.getDataSource())
                 .withTableName("films")
                 .usingGeneratedKeyColumns("id");
@@ -130,5 +123,41 @@ public class FilmDbStorage implements FilmStorage {
             throw new IncorrectIdException(String.format("Фильм с id %s отсутствует в системе", id));
         }
         return films.get(0);
+    }
+
+    @Override
+    public List<Mpa> getAllMpa() {
+        return jdbcTemplate.query("SELECT * FROM mpa;", (rs, rowNum) -> new Mpa(
+                rs.getInt("id"),
+                rs.getString("name")
+        ));
+    }
+
+    @Override
+    public Mpa getTargetMpa(Integer mpaId) {
+        List<Mpa> mpa = jdbcTemplate.query("SELECT * FROM mpa WHERE id=?", (rs, rowNum) -> new Mpa(
+                rs.getInt("id"),
+                rs.getString("name")
+        ), mpaId);
+        if (mpa.size() != 1) {
+            throw new IncorrectIdException("Не верный идентификатор Mpa");
+        }
+        return mpa.get(0);
+    }
+
+    @Override
+    public List<Genre> getAllGenres() {
+        return jdbcTemplate.query("SELECT * FROM genre", (rs, rowNum) -> new Genre(rs.getInt("id"),
+                rs.getString("name")));
+    }
+
+    @Override
+    public Genre getTargetGenre(Integer genreId) {
+        List<Genre> genres = jdbcTemplate.query("SELECT * FROM genre WHERE id=?", (rs, rowNum) -> new Genre(rs.getInt("id"),
+                rs.getString("name")), genreId);
+        if (genres.size() != 1) {
+            throw new IncorrectIdException("Не верный идентификатор Жанра");
+        }
+        return genres.get(0);
     }
 }

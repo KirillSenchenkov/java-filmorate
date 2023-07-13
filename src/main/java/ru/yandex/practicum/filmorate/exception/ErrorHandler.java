@@ -21,4 +21,10 @@ public class ErrorHandler {
     public Map<String, String> handleServerError(RuntimeException exception) {
         return Map.of("Ошибка сервера", exception.getMessage());
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleBadRequest(ValidationException exception) {
+        return Map.of("Невалидные данные", exception.getMessage());
+    }
 }
