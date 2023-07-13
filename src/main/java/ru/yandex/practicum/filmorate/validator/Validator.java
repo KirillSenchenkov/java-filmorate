@@ -9,7 +9,8 @@ import java.time.LocalDate;
 
 @Slf4j
 public class Validator {
-    private static final LocalDate startDate = LocalDate.of(1895, 12, 28);
+    private static final LocalDate START_DATE = LocalDate.of(1895, 12, 28);
+    private static final Integer MAX_LENGTH_DESCRIPTION = 200;
 
     public static void validate(User user) {
         if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
@@ -36,10 +37,10 @@ public class Validator {
         } else if (film.getReleaseDate() == null) {
             log.debug("Не задана дата выпуска фильма");
             throw new ValidationException("Дата создания не может пустой");
-        } else if (film.getReleaseDate().isBefore(startDate)) {
-            log.debug("Дата фильма " + film.getReleaseDate() + " раньше чем " + startDate);
-            throw new ValidationException("Дата создания не может быть раньше " + startDate);
-        } else if (film.getDescription() == null || film.getDescription().length() > 200) {
+        } else if (film.getReleaseDate().isBefore(START_DATE)) {
+            log.debug("Дата фильма " + film.getReleaseDate() + " раньше чем " + START_DATE);
+            throw new ValidationException("Дата создания не может быть раньше " + START_DATE);
+        } else if (film.getDescription() == null || film.getDescription().length() > MAX_LENGTH_DESCRIPTION) {
             log.debug("Описание превышает максимальное количество символов: " + film.getDescription());
             throw new ValidationException("Описание не может превышать 200 символов");
         } else if (film.getDuration() == null) {
@@ -50,6 +51,7 @@ public class Validator {
             throw new ValidationException("Продолжительность фильма не может быть отрицательной");
         } else {
             log.debug("Проверка фильма пройдена");
+
         }
     }
 

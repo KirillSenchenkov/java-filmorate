@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
@@ -9,6 +10,7 @@ import java.util.Set;
 
 @Getter
 @Setter
+@ToString
 public class User {
     private int id;
     private String email;
@@ -17,12 +19,13 @@ public class User {
     private LocalDate birthday;
     private Set<Integer> friends = new LinkedHashSet<>();
 
-    public User(String email, String login, String name, LocalDate birthday) {
+    public User(String login, String name, String email, LocalDate birthday) {
         this.email = email;
         this.login = login;
         this.name = name;
         this.birthday = birthday;
     }
+
 
     public void addFriend(Integer id) {
         friends.add(id);

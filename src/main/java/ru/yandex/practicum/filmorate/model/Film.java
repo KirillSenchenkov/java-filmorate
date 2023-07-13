@@ -4,7 +4,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -16,6 +18,8 @@ public class Film {
     private LocalDate releaseDate;
     private Integer duration;
     private Set<Integer> likes = new LinkedHashSet<>();
+    private Mpa mpa;
+    private List<Genre> genres = new ArrayList<>();
 
     public Film(String name, String description, LocalDate releaseDate, Integer duration) {
         this.name = name;
@@ -30,7 +34,5 @@ public class Film {
 
     public void deleteLike(Integer userId) {
         likes.remove(userId);
-
     }
-
 }
