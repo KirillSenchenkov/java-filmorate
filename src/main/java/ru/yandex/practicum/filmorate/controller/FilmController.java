@@ -4,8 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.service.film.FilmService;
 
 import java.util.List;
 
@@ -15,32 +14,31 @@ import java.util.List;
 @AllArgsConstructor
 public class FilmController {
 
-    private final FilmStorage filmStorage;
     private final FilmService filmService;
 
     @GetMapping
     public List<Film> filmList() {
-        return filmStorage.allFilms();
+        return filmService.allFilms();
     }
 
     @PostMapping
     public Film createFilm(@RequestBody Film film) {
-        return filmStorage.create(film);
+        return filmService.create(film);
     }
 
     @PutMapping
     public Film updateFilm(@RequestBody Film film) {
-        return filmStorage.update(film);
+        return filmService.update(film);
     }
 
     @GetMapping("/{filmId}")
     public Film getFilmById(@PathVariable Integer filmId) {
-        return filmStorage.getTargetFilm(filmId);
+        return filmService.getTargetFilm(filmId);
     }
 
     @DeleteMapping("/{filmId}")
     public String deleteFilm(@PathVariable Integer filmId) {
-        return filmStorage.delete(filmId);
+        return filmService.delete(filmId);
     }
 
     @PutMapping("/{filmId}/like/{userId}")
@@ -58,4 +56,6 @@ public class FilmController {
             @RequestParam(value = "count", defaultValue = "10", required = false) Integer count) {
         return filmService.getFilmByPopularity(count);
     }
+
+
 }
